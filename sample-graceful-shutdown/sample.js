@@ -12,6 +12,22 @@
 // a graceful shutdown of node process, just a forced exit
 //
 
+// Docker uses Linux signals to stop app(SIGINT/SIGTERM/SIGKILL)
+// SIGINT/SIGTERM allow graceful stop
+// npm doesn't respond to SIGINT/SIGTERM
+// node doesn't respond by default, but can with node
+// Docker provides a init PID 1 replacement option
+
+// First option 
+// Run any node app with --init to handle signals(temp solution)
+// docker run --init -d nodeapp
+
+// Second option
+// Add tini to your Dockerfile, then use it in CMD(permanent workaround)
+//> RUN apk add --no-cache tini
+//> ENTRYPOINT ["/sbin/tini", "--"]
+//> CMD ["node", "./bin/www"]
+
 // quit on ctrl-c when running docker in terminal
 process.on('SIGINT', function onSigint () {
 	console.info('Got SIGINT (aka ctrl-c in docker). Graceful shutdown ', new Date().toISOString());
